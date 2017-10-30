@@ -14,6 +14,10 @@ classdef Gaussian < handle
 %   Gaussian(u = nx1, s = nx1, x = mx1): A nD normal dist, returns the
 %       value for the evaluation for all the elements in vector x
     
+    properties (Access = protected) %Constants
+        allowed_types = {'Normal', 'Clipped', 'Folded'}
+        s_clipped
+    end
     properties
         dim %Gaussian dimension
         u   %Gaussian mean
@@ -46,18 +50,42 @@ classdef Gaussian < handle
                 else
                     error('Dimension mismatch on inputs')
                 end
+                
                 % Set distribution type
                 if nargin == 3
+                    tmp = zeros(1,3) == 1;
+                    for i=1:size(this.allowed_types,2)
+                        tmp(i) = strcmp(varargin{3}, this.allowed_types{i});
+                    end
+                    if ~any(tmp)
+                       error('Incorrect distribution type.  Options are Normal, Clipped, Folded.') 
+                    end
                     this.distribution_type = varargin{3};
                 else
                     this.distribution_type = 'Normal';
                 end
-            else
+                
+            else % Error Case
                 class(varargin)
                 size(varargin)
                 error('Unknown argument to Gaussian constructor of type and size listed above')
             end% End if 
         end
+        
+        function p = analytical_eval_normal(this, x)
+           % Analytical evaluation of the equation
+           if this.dim == 1
+               p = 1/sqrt(2*pi*this.s) * exp(-(x-this.u).^2./(2*this.s)^2);
+           elseif this.dim >= 1
+               err = (x-this.u);
+               p = 1/((2*pi)^this.dim/2*sqrt(det(this.s))) * exp(-.5*err.'*this.s*err);
+           end
+        end
+        
+        function calculate_s_clipped
+            
+        end
+        
         
         function outputArg = method1(obj,inputArg)
             %METHOD1 Summary of this method goes here
