@@ -6,6 +6,7 @@ clc
 
 dtool = DynTool;
 
+% Angle of joints measured relative to the ground
 [phi1,dphi1] = dtool.addCoord('p1');
 [phi2,dphi2] = dtool.addCoord('p2');
 
@@ -18,6 +19,7 @@ g = 9.81;
 I1 = m1 * l1^2/4;
 I2 = m2 * l2^2/4;
 
+%Neutral position is hanging down
 pos1 = l1/2 * [ sin(phi1), -cos(phi1) ];
 pos2 = 2*pos1 + l2/2 * [ sin(phi2), cos(phi2) ];
 
